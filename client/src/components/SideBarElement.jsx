@@ -9,13 +9,10 @@ export const SideBarElement = ({ text, to, icon }) => {
   };
 
   const checkActive = () => {
-    // Define the base and active classes
     const relativePathName = pathname.split('/').at(3);
     const baseClasses =
       'm-5 cursor-pointer rounded-lg p-3 flex items-center space-x-3 hover:bg-gray-800 hover:text-[#4A90E2]';
     const activeClasses = 'bg-gray-800 text-[#4A90E2]';
-
-    // If the current route matches the 'to' prop, return active classes
     return to === relativePathName ||
       (relativePathName === undefined && to === '')
       ? `${baseClasses} ${activeClasses}`

@@ -1,6 +1,8 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { Trash2, Upload } from 'lucide-react';
 import {
   Award,
   Briefcase,
@@ -11,22 +13,76 @@ import {
   User,
 } from 'lucide-react';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchLoggedInUser } from '../query/fetchLoggedInUser';
 
 export default function ProfileDashboard() {
+  const [imagePreview, setImagePreview] = useState(null);
+  const [newSkill, setNewSkill] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    skills: [],
+    languages: [],
+    certificates: [],
+    profileImage: null,
+  });
+
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['me'],
     queryFn: fetchLoggedInUser,
     staleTime: 60 * 1000,
   });
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addItem = (type, value, setter) => {
+    if (value.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        [type]: [...prev[type], value.trim()],
+      }));
+      setter('');
+    }
+  };
+
   if (isPending) {
     return (
-      <div className="bg-background min-h-screen pb-16">
+      <div className="min-h-screen bg-background pb-16">
         <div className="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8">
           <div className="space-y-4">
             <Skeleton className="h-8 w-[200px]" />
@@ -52,7 +108,7 @@ export default function ProfileDashboard() {
 
   if (isError) {
     return (
-      <div className="bg-background flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Card className="w-[400px]">
           <CardHeader>
             <CardTitle className="text-destructive">
@@ -68,7 +124,7 @@ export default function ProfileDashboard() {
   }
 
   return (
-    <div className="bg-background min-h-screen w-full pb-16 pt-12">
+    <div className="min-h-screen w-full bg-background pb-16 pt-12">
       <div className="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -80,12 +136,58 @@ export default function ProfileDashboard() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
+          {/* Profile Image */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Image</CardTitle>
+              <CardDescription>Update your profile picture</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center space-y-4">
+              <div className="relative">
+                {imagePreview ? (
+                  <img
+                    src={`${IMAGE_URL}${imagePreview.split('/')[3]}`}
+                    alt="Profile"
+                    className="h-32 w-32 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-32 w-32 items-center justify-center rounded-full bg-muted">
+                    <span className="text-2xl">👤</span>
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  id="profile-image-input"
+                />
+              </div>
+              <div className="flex gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    document.getElementById('profile-image-input').click()
+                  }
+                >
+                  Choose Image
+                </Button>
+                {selectedImage && (
+                  <Button type="button" onClick={handleImageUpdate}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
           {/* Personal Information */}
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0">
               <div className="flex items-center space-x-3">
-                <div className="bg-primary/10 rounded-lg p-2">
-                  <User className="text-primary h-6 w-6" />
+                <div className="rounded-lg bg-primary/10 p-2">
+                  <User className="h-6 w-6 text-primary" />
                 </div>
                 <CardTitle>Personal Information</CardTitle>
               </div>
@@ -95,16 +197,59 @@ export default function ProfileDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <p className="text-muted-foreground text-sm">Full Name</p>
+                <p className="text-sm text-muted-foreground">Full Name</p>
                 <p>{`${data.firstName} ${data.lastName}`}</p>
               </div>
               <div className="space-y-2">
-                <p className="text-muted-foreground text-sm">Username</p>
+                <p className="text-sm text-muted-foreground">Username</p>
                 <p>{data.userName}</p>
               </div>
-              <div className="text-muted-foreground flex items-center text-sm">
+              <div className="flex items-center text-sm text-muted-foreground">
                 <Clock className="mr-2 h-4 w-4" />
                 Last updated: {new Date(data.lastUpdated).toLocaleDateString()}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Skills */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Skills</CardTitle>
+              <CardDescription>
+                Add or remove your technical skills
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  placeholder="Add a new skill"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addItem('skills', newSkill, setNewSkill);
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  onClick={() => addItem('skills', newSkill, setNewSkill)}
+                >
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {formData.skills.map((skill) => (
+                  <Badge
+                    key={skill}
+                    variant="secondary"
+                    className="cursor-pointer"
+                    onClick={() => removeItem('skills', skill)}
+                  >
+                    {skill} ×
+                  </Badge>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -113,8 +258,8 @@ export default function ProfileDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0">
               <div className="flex items-center space-x-3">
-                <div className="bg-primary/10 rounded-lg p-2">
-                  <Mail className="text-primary h-6 w-6" />
+                <div className="rounded-lg bg-primary/10 p-2">
+                  <Mail className="h-6 w-6 text-primary" />
                 </div>
                 <CardTitle>Contact Details</CardTitle>
               </div>
@@ -124,12 +269,12 @@ export default function ProfileDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <p className="text-muted-foreground text-sm">Email Address</p>
+                <p className="text-sm text-muted-foreground">Email Address</p>
                 <p>{data.email}</p>
               </div>
-              <div className="bg-muted rounded-lg p-4">
+              <div className="rounded-lg bg-muted p-4">
                 <p className="text-sm font-medium">About</p>
-                <p className="text-muted-foreground mt-2 whitespace-pre-line">
+                <p className="mt-2 whitespace-pre-line text-muted-foreground">
                   {data.description || 'No description provided'}
                 </p>
               </div>
@@ -140,8 +285,8 @@ export default function ProfileDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0">
               <div className="flex items-center space-x-3">
-                <div className="bg-primary/10 rounded-lg p-2">
-                  <Briefcase className="text-primary h-6 w-6" />
+                <div className="rounded-lg bg-primary/10 p-2">
+                  <Briefcase className="h-6 w-6 text-primary" />
                 </div>
                 <CardTitle>Professional Expertise</CardTitle>
               </div>
@@ -151,7 +296,7 @@ export default function ProfileDashboard() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-3">
-                <h3 className="text-muted-foreground text-sm font-medium">
+                <h3 className="text-sm font-medium text-muted-foreground">
                   Technical Skills
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -162,14 +307,14 @@ export default function ProfileDashboard() {
                       </Badge>
                     ))
                   ) : (
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       No skills listed yet
                     </p>
                   )}
                 </div>
               </div>
               <div className="space-y-3">
-                <h3 className="text-muted-foreground text-sm font-medium">
+                <h3 className="text-sm font-medium text-muted-foreground">
                   Languages
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -180,7 +325,7 @@ export default function ProfileDashboard() {
                       </Badge>
                     ))
                   ) : (
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       No languages listed yet
                     </p>
                   )}
@@ -193,8 +338,8 @@ export default function ProfileDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0">
               <div className="flex items-center space-x-3">
-                <div className="bg-primary/10 rounded-lg p-2">
-                  <Award className="text-primary h-6 w-6" />
+                <div className="rounded-lg bg-primary/10 p-2">
+                  <Award className="h-6 w-6 text-primary" />
                 </div>
                 <CardTitle>Certifications & Achievements</CardTitle>
               </div>
@@ -208,7 +353,7 @@ export default function ProfileDashboard() {
                   {data.certificates.map((cert, index) => (
                     <div
                       key={index}
-                      className="hover:bg-muted flex items-center justify-between rounded-lg border p-4 transition-colors"
+                      className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted"
                     >
                       <div className="flex items-center space-x-3">
                         <Award className="h-5 w-5 text-yellow-600" />
@@ -222,13 +367,54 @@ export default function ProfileDashboard() {
                 </div>
               ) : (
                 <div className="rounded-lg border-2 border-dashed p-6 text-center">
-                  <Award className="text-muted-foreground mx-auto h-8 w-8" />
+                  <Award className="mx-auto h-8 w-8 text-muted-foreground" />
                   <p className="mt-2 font-medium">No certificates added yet</p>
-                  <p className="text-muted-foreground mt-1 text-sm">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Add your professional certifications and achievements
                   </p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Account Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Actions</CardTitle>
+              <CardDescription>Update or delete your account</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-between gap-4">
+              <Button type="submit" className="flex-1">
+                Save Changes
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="flex-1">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      your account and remove your data from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deleteUserMutation.mutate()}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete Account
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardContent>
           </Card>
         </div>
