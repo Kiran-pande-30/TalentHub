@@ -40,7 +40,10 @@ const workController = {
     if (!work) {
       return next(new AppError(`No Work with that id found`, 404))
     }
-    next()
+    res.status(200).json({
+      status: 'success',
+      data: {work},
+    })
   }),
 
   /**
@@ -57,15 +60,15 @@ const workController = {
       },
       { new: true },
     )
+    if (!work) {
+      return next(new AppError(`No Work with that id found`, 404))
+    }
 
     await User.findByIdAndUpdate(req.body.freelancerId, {
       $inc: { balance: work.pay },
     })
 
-    if (!work) {
-      return next(new AppError(`No Work with that id found`, 404))
-    }
-
+  
     res.status(200).json({
       status: 'success',
       data: {
