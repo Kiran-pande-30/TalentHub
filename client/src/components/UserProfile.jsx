@@ -122,6 +122,7 @@ export default function ProfileDashboard() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
+
           {/* Personal Information */}
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0">

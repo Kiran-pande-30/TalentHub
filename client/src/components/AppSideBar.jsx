@@ -1,5 +1,5 @@
 import { Calendar, Home, Inbox, Search, Settings } from 'lucide-react';
-import { Avatar, AvatarImage } from './ui/avatar';
+import { Avatar } from './ui/avatar';
 import { AvatarFallback } from '@radix-ui/react-avatar';
 
 import {
