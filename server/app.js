@@ -19,6 +19,7 @@ import swaggerDocs from './utils/swagger.js'
 export async function initServer() {
   const app = express();
 
+
   // MIDDLEWARES
   //let user download static files user profile images
   app.use(express.static('uploads/profile-images'))
@@ -30,8 +31,9 @@ export async function initServer() {
 
   const corsOptions = {
     origin: [
-      'http://localhost:4173',
-      'http://localhost:5173',
+      process.env.NODE_ENV !== 'production'
+        ? 'http://localhost:5173'
+        : 'https://talenthubs.vercel.app/',
     ],
     credentials: true,
   }
