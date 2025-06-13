@@ -1,9 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { IMAGE_URL } from '../utils/constants';
 import { Badge } from './ui/badge';
-import { Avatar, AvatarImage } from './ui/avatar';
-import { AvatarFallback } from '@radix-ui/react-avatar';
+import { Avatar } from './ui/avatar';
 import { getDate } from '@/utils/convertDate';
 import { Button } from './ui/button';
 
@@ -42,22 +40,6 @@ const UserCard = ({ user, index }) => {
                   (user.LastName === undefined ? '' : user.LastName)}
               </p>
             </div>
-            <Avatar>
-              {user.profileImage === undefined ? (
-                ''
-              ) : (
-                <AvatarImage
-                  src={`${IMAGE_URL}${user?.profileImage?.split('/')[3]}`}
-                />
-              )}
-              <AvatarFallback>
-                <img
-                  src={getSvg(index)}
-                  alt="icon"
-                  className="size-9 sm:size-12"
-                />
-              </AvatarFallback>
-            </Avatar>
           </div>
           {/* Tags */}
           <div className="flex flex-wrap gap-2">

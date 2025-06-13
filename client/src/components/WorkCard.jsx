@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Badge } from './ui/badge';
-import { Avatar, AvatarImage } from './ui/avatar';
+import { Avatar } from './ui/avatar';
 import { AvatarFallback } from '@radix-ui/react-avatar';
 import { getDate } from '@/utils/convertDate';
 import { Button } from './ui/button';
@@ -45,7 +45,6 @@ const WorkCard = ({ work, index }) => {
               </p>
             </div>
             <Avatar>
-              <AvatarImage src={work.client_id?.profileImage} />
               <AvatarFallback>
                 <img
                   src={getSvg(index)}

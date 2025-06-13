@@ -14,7 +14,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { fetchLoggedInUser } from '@/query/fetchLoggedInUser';
-import { IMAGE_URL } from '@/utils/constants';
 import { useQuery } from '@tanstack/react-query';
 
 // Menu items.
@@ -84,16 +83,9 @@ export function AppSidebar() {
           {user && (
             <div className="flex items-center gap-4">
               <Avatar>
-                {user.profileImage ? (
-                  <AvatarImage
-                    src={`${IMAGE_URL}${user.profileImage.split('/')[3]}`}
-                    alt={`${user.userName}'s profile image`}
-                  />
-                ) : (
                   <AvatarFallback>
                     {user.userName ? user.userName.slice(0, 2) : 'NA'}
                   </AvatarFallback>
-                )}
               </Avatar>
               {user.userName && <h1>{user.userName}</h1>}
             </div>

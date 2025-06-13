@@ -27,7 +27,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Label } from '@/components/ui/label';
-import { API_URL, IMAGE_URL } from '../utils/constants';
+import { API_URL } from '../utils/constants';
 import { fetchLoggedInUser } from '../query/fetchLoggedInUser';
 
 export default function UserSettings() {
@@ -35,8 +35,6 @@ export default function UserSettings() {
   const [newSkill, setNewSkill] = useState('');
   const [newLanguage, setNewLanguage] = useState('');
   const [newCertificate, setNewCertificate] = useState('');
-  const [imagePreview, setImagePreview] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
 
   const {
     data: user,
@@ -55,31 +53,6 @@ export default function UserSettings() {
     skills: [],
     languages: [],
     certificates: [],
-    profileImage: null,
-  });
-
-  // Update profile image mutation
-  const updateProfileImageMutation = useMutation({
-    mutationFn: async (file) => {
-      const token = localStorage.getItem('token');
-      const formData = new FormData();
-      formData.append('profileImage', file);
-
-      return axios.patch(`${API_URL}/users/me/profile-image`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-    },
-    onSuccess: () => {
-      toast.success('Profile image updated successfully');
-      queryClient.invalidateQueries({ queryKey: ['me'] });
-      setSelectedImage(null);
-    },
-    onError: (error) => {
-      toast.error(`Failed to update profile image: ${error.message}`);
-    },
   });
 
   // Update user mutation
@@ -120,24 +93,6 @@ export default function UserSettings() {
     },
   });
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleImageUpdate = async () => {
-    if (selectedImage) {
-      updateProfileImageMutation.mutate(selectedImage);
-    }
-  };
-
   const handleUpdate = async (e) => {
     e.preventDefault();
     updateUserMutation.mutate(formData);
@@ -169,9 +124,7 @@ export default function UserSettings() {
         skills: user.skills || [],
         languages: user.languages || [],
         certificates: user.certificates || [],
-        profileImage: user.profileImage || null,
       });
-      setImagePreview(user.profileImage || null);
     }
   }, [user]);
 
@@ -222,53 +175,6 @@ export default function UserSettings() {
 
       <form onSubmit={handleUpdate}>
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Profile Image Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Image</CardTitle>
-              <CardDescription>Update your profile picture</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center space-y-4">
-              <div className="relative">
-                {imagePreview ? (
-                  <img
-                    src={`${IMAGE_URL}${imagePreview.split('/')[3]}`}
-                    alt="Profile"
-                    className="h-32 w-32 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="bg-muted flex h-32 w-32 items-center justify-center rounded-full">
-                    <span className="text-2xl">👤</span>
-                  </div>
-                )}
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="profile-image-input"
-                />
-              </div>
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    document.getElementById('profile-image-input').click()
-                  }
-                >
-                  Choose Image
-                </Button>
-                {selectedImage && (
-                  <Button type="button" onClick={handleImageUpdate}>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Personal Information Card */}
           <Card>
             <CardHeader>

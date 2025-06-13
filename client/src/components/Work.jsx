@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 import { Loader2, Building2, Users, Briefcase, DollarSign } from 'lucide-react';
@@ -86,7 +86,6 @@ const Work = () => {
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
                 <Avatar>
-                  <AvatarImage src={data.client_id?.profileImage} />
                   <AvatarFallback>
                     {data.client_id?.userName.slice(0, 2)}
                   </AvatarFallback>

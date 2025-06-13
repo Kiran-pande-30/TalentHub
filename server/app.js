@@ -18,12 +18,6 @@ import swaggerDocs from './utils/swagger.js'
 
 export async function initServer() {
   const app = express();
-
-
-  // MIDDLEWARES
-  //let user download static files user profile images
-  app.use(express.static('uploads/profile-images'))
-
   app.use(express.json())
   app.use(helmet()) // Apply secure headers to all routes
 

@@ -6,7 +6,7 @@ import axios from 'axios';
 import { BadgeCheck, Mail, Star, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -193,7 +193,6 @@ export default function ClientFilterWork() {
                 <CardHeader>
                   <div className="flex items-center space-x-4">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage src={user.profileImage} />
                       <AvatarFallback>{user.userName[0]}</AvatarFallback>
                     </Avatar>
                     <div className="space-y-1">

@@ -39,9 +39,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { fetchLoggedInUser } from '../query/fetchLoggedInUser';
 
 export default function ProfileDashboard() {
-  const [imagePreview, setImagePreview] = useState(null);
   const [newSkill, setNewSkill] = useState('');
-  const [selectedImage, setSelectedImage] = useState(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -49,7 +47,6 @@ export default function ProfileDashboard() {
     skills: [],
     languages: [],
     certificates: [],
-    profileImage: null,
   });
 
   const { data, isPending, isError, error } = useQuery({
@@ -58,17 +55,6 @@ export default function ProfileDashboard() {
     staleTime: 60 * 1000,
   });
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const addItem = (type, value, setter) => {
     if (value.trim()) {
@@ -136,52 +122,6 @@ export default function ProfileDashboard() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Profile Image */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Image</CardTitle>
-              <CardDescription>Update your profile picture</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center space-y-4">
-              <div className="relative">
-                {imagePreview ? (
-                  <img
-                    src={`${IMAGE_URL}${imagePreview.split('/')[3]}`}
-                    alt="Profile"
-                    className="h-32 w-32 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-32 w-32 items-center justify-center rounded-full bg-muted">
-                    <span className="text-2xl">👤</span>
-                  </div>
-                )}
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="profile-image-input"
-                />
-              </div>
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    document.getElementById('profile-image-input').click()
-                  }
-                >
-                  Choose Image
-                </Button>
-                {selectedImage && (
-                  <Button type="button" onClick={handleImageUpdate}>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
           {/* Personal Information */}
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0">

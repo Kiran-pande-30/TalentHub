@@ -1,4 +1,3 @@
-// import profileImage from "../assets/profile.jpg"; // Placeholder profile image
 import { useEffect, useState } from 'react';
 import OverviewCard from './OverviewCard';
 import axios from 'axios';
