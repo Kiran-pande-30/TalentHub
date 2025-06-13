@@ -18,7 +18,7 @@ import swaggerDocs from './utils/swagger.js'
 
 export async function initServer() {
   const app = express();
-  app.use(express.json())
+  app.use(express.json()({ limit: '4mb' }))
   app.use(helmet()) // Apply secure headers to all routes
 
   app.use(cookieParser())
