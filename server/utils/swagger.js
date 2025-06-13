@@ -37,8 +37,6 @@ function swaggerDocs(app, port) {
     res.setHeader('Content-Type', 'application/json')
     res.send(swaggerSpec)
   })
-
-  log.info(`Docs available at http://localhost:${port}/docs`)
 }
 
 export default swaggerDocs
