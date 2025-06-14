@@ -63,7 +63,14 @@ const Signup = () => {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      let data;
+      const contentType = response.headers.get('content-type');
+      if(contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        throw new Error('Unexpected response format');
+      }
+      // const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || 'Something went wrong');
